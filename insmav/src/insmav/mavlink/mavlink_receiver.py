@@ -1,21 +1,31 @@
-from ..mavlink_config import mavutil
+from collections import defaultdict
+
+from insmav.mavlink.mavlink_config import mavutil
 
 
 class MavlinkReceiver:
-    def __init__(
-        self,
-        telemetry_handler,
-        dataset_handler,
-        log_handler,
-        ack_handler,
-    ):
-        self._telemetry_handler = telemetry_handler
-        self._dataset_handler = dataset_handler
-        self._log_handler = log_handler
-        self._ack_handler = ack_handler
+    def __init__(self):
         self._parser = mavutil.mavlink.MAVLink(None)
+        self._subscribers = defaultdict(list)
+        self._fallback_subscribers = []
 
         print("[mavlink][MavlinkReceiver][__init__] Initialized")
+
+    def subscribe(self, message_type: str, callback) -> None:
+        self._subscribers[message_type].append(callback)
+
+        print(
+            f"[mavlink][MavlinkReceiver][subscribe] "
+            f"type={message_type} callbacks={len(self._subscribers[message_type])}"
+        )
+
+    def subscribe_fallback(self, callback) -> None:
+        self._fallback_subscribers.append(callback)
+
+        print(
+            f"[mavlink][MavlinkReceiver][subscribe_fallback] "
+            f"callbacks={len(self._fallback_subscribers)}"
+        )
 
     def handle_bytes(self, data: bytes) -> None:
         for byte in data:
@@ -28,21 +38,31 @@ class MavlinkReceiver:
 
     def _handle_message(self, message) -> None:
         message_type = message.get_type()
+        callbacks = self._subscribers.get(message_type)
 
-        if message_type == "COMMAND_ACK":
-            print("[mavlink][MavlinkReceiver][_handle_message] -> ACK")
-            self._ack_handler.handle(message)
+        if callbacks:
+            print(
+                f"[mavlink][MavlinkReceiver][_handle_message] "
+                f"type={message_type} subscribers={len(callbacks)}"
+            )
+
+            for callback in callbacks:
+                callback(message)
+
             return
 
-        if message_type == "DEBUG_FLOAT_ARRAY":
-            print("[mavlink][MavlinkReceiver][_handle_message] -> DATASET")
-            self._dataset_handler.handle(message)
+        if self._fallback_subscribers:
+            print(
+                f"[mavlink][MavlinkReceiver][_handle_message] "
+                f"type={message_type} -> fallback subscribers={len(self._fallback_subscribers)}"
+            )
+
+            for callback in self._fallback_subscribers:
+                callback(message)
+
             return
 
-        if message_type == "LOG_DATA":
-            print("[mavlink][MavlinkReceiver][_handle_message] -> LOG")
-            self._log_handler.handle(message)
-            return
-
-        print("[mavlink][MavlinkReceiver][_handle_message] -> TELEMETRY")
-        self._telemetry_handler.handle(message)
+        print(
+            f"[mavlink][MavlinkReceiver][_handle_message] "
+            f"No subscribers for type={message_type}"
+        )

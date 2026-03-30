@@ -1,4 +1,4 @@
-from ..mavlink_config import mavutil
+from insmav.mavlink.mavlink_config import mavutil
 
 
 class _UdpWriteAdapter:

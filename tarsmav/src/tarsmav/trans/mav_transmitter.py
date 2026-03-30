@@ -1,3 +1,0 @@
-class MavTransmitter:
-    def send(self, message: object) -> None:
-        ...
