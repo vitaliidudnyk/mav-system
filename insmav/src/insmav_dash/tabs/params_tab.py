@@ -9,7 +9,8 @@ def build_params_tab():
                 id="params-table",
                 columns=[
                     {"name": "Name", "id": "name", "editable": False},
-                    {"name": "Value", "id": "value", "editable": True},
+                    {"name": "Value", "id": "value", "editable": False},
+                    {"name": "New Value", "id": "new_value", "editable": True},
                     {"name": "Status", "id": "status", "editable": False},
                     {"name": "Type", "id": "type", "editable": False},
                 ],

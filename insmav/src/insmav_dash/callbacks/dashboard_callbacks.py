@@ -7,7 +7,6 @@ def register_dashboard_callbacks(app, state, _core) -> None:
     @app.callback(
         Output("telemetry-summary", "children"),
         Output("telemetry-last-messages", "children"),
-        Output("params-table", "data"),
         Output("logs-container", "children"),
         Output("dataset-dropdown", "options"),
         Output("dataset-dropdown", "value"),
@@ -17,13 +16,11 @@ def register_dashboard_callbacks(app, state, _core) -> None:
     )
     def update_dashboard(_n_intervals, selected_dataset_type):
         telemetry = state.get_telemetry()
-        params = state.get_params()
         logs = state.get_logs()
         datasets = state.get_datasets()
 
         telemetry_summary = _build_telemetry_summary(telemetry)
         telemetry_last_messages = _build_telemetry_last_messages(telemetry)
-        params_rows = _build_params_rows(params)
         logs_children = _build_logs(logs)
 
         dataset_options = [
@@ -42,7 +39,6 @@ def register_dashboard_callbacks(app, state, _core) -> None:
         return (
             telemetry_summary,
             telemetry_last_messages,
-            params_rows,
             logs_children,
             dataset_options,
             selected_dataset_type,
@@ -81,22 +77,6 @@ def _build_telemetry_last_messages(telemetry: list):
             for message in reversed(recent_messages)
         ]
     )
-
-
-def _build_params_rows(params: dict) -> list[dict]:
-    rows = []
-
-    for name, data in sorted(params.items()):
-        rows.append(
-            {
-                "name": data.get("name", name),
-                "value": data.get("value"),
-                "status": data.get("status"),
-                "type": data.get("type"),
-            }
-        )
-
-    return rows
 
 
 def _build_logs(logs: list[str]):
