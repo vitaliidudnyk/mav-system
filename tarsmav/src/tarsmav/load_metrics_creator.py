@@ -1,6 +1,6 @@
 import time
 
-from tarsmav.custom_data_creator import CustomDataCreator
+from tarsmav.streams.custom_data.custom_data_creator import CustomDataCreator
 from tarsmav.mavlink.sender_monitor import SenderMonitor
 from tarsmav.streams.custom_data.custom_data_sets import SenderSnapshot
 

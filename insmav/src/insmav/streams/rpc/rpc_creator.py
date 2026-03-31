@@ -2,7 +2,7 @@ from dataclasses import astuple
 
 from pymavlink import mavutil
 
-from insmav.streams.rpc.rpc_events import RpcEvent
+from shared.rpc.rpc_events import RpcEvent
 
 
 class RpcCreator:
@@ -23,11 +23,8 @@ class RpcCreator:
         self._confirmation = confirmation
 
     def send(self, event: RpcEvent) -> None:
-        command = self._find_command(event)
-        params = list(self._extract_params(event))
-
-        while len(params) < self._PARAMS_COUNT:
-            params.append(0.0)
+        command = self.get_command(event)
+        params = self.get_padded_params(event)
 
         message = mavutil.mavlink.MAVLink_command_long_message(
             target_system=self._target_system,
@@ -45,7 +42,7 @@ class RpcCreator:
 
         self._mavlink_sender.send(message)
 
-    def _find_command(self, event: RpcEvent) -> int:
+    def get_command(self, event: RpcEvent) -> int:
         event_type = type(event)
 
         for command, mapped_event_type in self._rpc_event_mapping.items():
@@ -55,6 +52,14 @@ class RpcCreator:
         raise ValueError(
             f"No RPC command mapping found for event type: {event_type.__name__}"
         )
+
+    def get_padded_params(self, event: RpcEvent) -> list[float]:
+        params = list(self._extract_params(event))
+
+        while len(params) < self._PARAMS_COUNT:
+            params.append(0.0)
+
+        return params
 
     def _extract_params(self, event: RpcEvent) -> tuple[float, ...]:
         params = astuple(event)

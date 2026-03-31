@@ -4,7 +4,7 @@ import time
 from dataclasses import fields
 
 from insmav.streams.rpc.rpc_creator import RpcCreator
-from insmav.streams.rpc.rpc_events import (
+from shared.rpc.rpc_events import (
     CalibrateImuEvent,
     SetModeEvent,
     StartMissionEvent,

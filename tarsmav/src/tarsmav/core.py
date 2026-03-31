@@ -1,9 +1,9 @@
-from tarsmav.custom_data_creator import CustomDataCreator
+from tarsmav.streams.custom_data.custom_data_creator import CustomDataCreator
 from tarsmav.mavlink.mavlink_receiver import MavLinkReceiver
 from tarsmav.mavlink.mavlink_sender import MavLinkSender
 from tarsmav.mavlink.sender_policy import SenderPolicy
 
-from tarsmav.streams.custom_data.load_metrics_creator import LoadMetricsCreator
+from tarsmav.load_metrics_creator import LoadMetricsCreator
 from tarsmav.streams.logs.log_creator import LogCreator
 from tarsmav.streams.rpc.rpc_command_handler import RpcCommandHandler
 from tarsmav.streams.telemetry.tel_creator import TelCreator

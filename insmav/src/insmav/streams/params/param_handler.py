@@ -2,9 +2,9 @@ from insmav.streams.shared.base_handler import BaseHandler
 
 
 class ParamHandler(BaseHandler):
-    def __init__(self, pending_params):
+    def __init__(self, pending_params, state):
         self._pending_params = pending_params
-        self._params = {}
+        self._state = state
 
     @property
     def message_type(self) -> str:
@@ -13,13 +13,19 @@ class ParamHandler(BaseHandler):
     def handle(self, message) -> None:
         name = self._extract_param_name(message)
         value = message.param_value
-
-        self._params[name] = value
+        param_type = getattr(message, "param_type", None)
 
         if self._pending_params.confirm_set(name, value):
             print(
                 f"[params][ParamHandler][handle] -> SET_CONFIRMED "
                 f"{name}={value}"
+            )
+
+            self._state.set_param(
+                name=name,
+                value=value,
+                status="confirmed",
+                param_type=param_type,
             )
             return
 
@@ -28,12 +34,26 @@ class ParamHandler(BaseHandler):
                 f"[params][ParamHandler][handle] -> VALUE_RECEIVED "
                 f"{name}={value}"
             )
+
+            self._state.set_param(
+                name=name,
+                value=value,
+                status="idle",
+                param_type=param_type,
+            )
             return
 
         if self._pending_params.is_request_all_pending():
             print(
                 f"[params][ParamHandler][handle] -> ALL_VALUE_RECEIVED "
                 f"{name}={value}"
+            )
+
+            self._state.set_param(
+                name=name,
+                value=value,
+                status="idle",
+                param_type=param_type,
             )
 
             if getattr(message, "param_index", -1) == getattr(message, "param_count", -2) - 1:
@@ -44,11 +64,12 @@ class ParamHandler(BaseHandler):
 
         print(f"[params][ParamHandler][handle] -> PARAM_VALUE {name}={value}")
 
-    def get_param(self, name: str):
-        return self._params.get(name)
-
-    def get_all_params(self) -> dict:
-        return dict(self._params)
+        self._state.set_param(
+            name=name,
+            value=value,
+            status="idle",
+            param_type=param_type,
+        )
 
     @staticmethod
     def _extract_param_name(message) -> str:

@@ -2,6 +2,8 @@ from insmav.streams.shared.base_handler import BaseHandler
 
 
 class TelemetryHandler(BaseHandler):
+    def __init__(self, state):
+        self._state = state
     def register(self, mavlink_receiver) -> None:
         mavlink_receiver.subscribe_fallback(self.handle)
 
@@ -12,3 +14,4 @@ class TelemetryHandler(BaseHandler):
 
     def handle(self, message) -> None:
         print(f"[Telemetry] {message}")
+        self._state.add_telemetry(message)

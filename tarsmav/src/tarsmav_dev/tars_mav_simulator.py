@@ -2,7 +2,7 @@ import math
 import time
 
 from tarsmav.streams.custom_data.custom_data_sets import AttitudeDebug, ImuDebug, BatteryDebug
-from tarsmav.custom_data_creator import CustomDataCreator
+from tarsmav.streams.custom_data.custom_data_creator import CustomDataCreator
 from tarsmav.streams.logs.log_creator import LogCreator
 from tarsmav.streams.telemetry.tel_creator import TelCreator
 

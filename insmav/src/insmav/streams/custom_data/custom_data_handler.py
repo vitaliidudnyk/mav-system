@@ -3,6 +3,9 @@ from insmav.streams.shared.base_handler import BaseHandler
 
 
 class DatasetHandler(BaseHandler):
+    def __init__(self, state):
+        self._state = state
+
     @property
     def message_type(self) -> str:
         return "DEBUG_FLOAT_ARRAY"
@@ -40,6 +43,8 @@ class DatasetHandler(BaseHandler):
             f"array_id={message.array_id} "
             f"dataset={dataset}"
         )
+
+        self._state.add_dataset(dataset_type.value, dataset)
 
     def _extract_name(self, message) -> str:
         raw_name = message.name

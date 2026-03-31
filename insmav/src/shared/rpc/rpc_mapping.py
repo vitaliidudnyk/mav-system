@@ -1,4 +1,4 @@
-from insmav.streams.rpc.rpc_events import StartMissionEvent, SetModeEvent, CalibrateImuEvent
+from shared.rpc.rpc_events import StartMissionEvent, SetModeEvent, CalibrateImuEvent
 
 RPC_START_MISSION = 31001
 RPC_SET_MODE = 31002

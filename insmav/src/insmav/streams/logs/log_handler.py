@@ -2,8 +2,9 @@ from insmav.streams.shared.base_handler import BaseHandler
 
 
 class LogHandler(BaseHandler):
-    def __init__(self):
+    def __init__(self, state):
         self._buffers = {}
+        self._state = state
 
     @property
     def message_type(self) -> str:
@@ -38,3 +39,14 @@ class LogHandler(BaseHandler):
         print(
             f"[Log] id={log_id} ofs={offset} count={count} text='{text}'"
         )
+
+        if b"\n" not in chunk:
+            return
+
+        completed_text = text.replace("\x00", "").strip()
+
+        if not completed_text:
+            return
+
+        self._state.add_log(completed_text)
+        del self._buffers[log_id]
