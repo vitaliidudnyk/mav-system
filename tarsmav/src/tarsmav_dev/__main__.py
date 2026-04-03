@@ -9,7 +9,7 @@ from tarsmav_dev.transport.udp_reader import UdpReader
 from tarsmav_dev.transport.udp_writer import UdpWriter
 
 
-def main():
+def main() -> None:
     host = "127.0.0.1"
 
     reader = UdpReader(host=host, port=14551)
@@ -26,15 +26,28 @@ def main():
         dataset=core.custom_data_creator,
     )
 
-    threading.Thread(target=core.start, daemon=True).start()
+    core_thread = threading.Thread(
+        target=core.start,
+        name="tarsmav-core-thread",
+    )
 
-    while True:
-        simulator.tick()
+    core_thread.start()
 
-        core.tel.tick()
-        core.load_metrics.tick()
+    try:
+        while True:
+            simulator.tick()
+            core.tel.tick()
+            core.load_metrics.tick()
 
-        time.sleep(0.01)
+            time.sleep(0.01)
+
+    except KeyboardInterrupt:
+        print("[main] Stopping...")
+
+        core.stop()
+        core_thread.join()
+
+        print("[main] Stopped cleanly")
 
 
 if __name__ == "__main__":

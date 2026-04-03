@@ -18,13 +18,17 @@ class UdpReader:
         self._socket.bind((self._host, self._port))
         self._socket.setblocking(False)
 
+        self._is_running = False
+
         print(f"[udp][UdpReader][__init__] Listening on {self._host}:{self._port}")
 
     def set_on_data_callback(self, callback) -> None:
         self._on_data = callback
-        
+
     def start(self) -> None:
-        while True:
+        self._is_running = True
+
+        while self._is_running:
             try:
                 data, addr = self._socket.recvfrom(self._buffer_size)
 
@@ -38,5 +42,10 @@ class UdpReader:
             except BlockingIOError:
                 time.sleep(0.001)  # prevent 100% CPU
 
-    def close(self) -> None:
+            except OSError:
+                # socket closed → exit loop
+                break
+
+    def stop(self) -> None:
+        self._is_running = False
         self._socket.close()

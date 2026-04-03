@@ -10,3 +10,6 @@ class UdpWriter:
     def send(self, data: bytes) -> None:
         print(f"[udp][UdpWriter][send] Sending {len(data)} bytes to {self._target}")
         self._sock.sendto(data, self._target)
+
+    def close(self) -> None:
+        self._sock.close()

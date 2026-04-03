@@ -1,7 +1,7 @@
 import time
 
+from tarsmav.mavlink.interfaces import ISenderMonitor
 from tarsmav.streams.custom_data.custom_data_creator import CustomDataCreator
-from tarsmav.mavlink.sender_monitor import SenderMonitor
 from tarsmav.streams.custom_data.custom_data_sets import SenderSnapshot
 
 
@@ -9,7 +9,7 @@ class LoadMetricsCreator:
     def __init__(
         self,
         custom_data_creator: CustomDataCreator,
-        sender_monitor: SenderMonitor,
+        sender_monitor: ISenderMonitor,
         rate_hz: float = 1.0,
     ):
         self._custom_data_creator = custom_data_creator

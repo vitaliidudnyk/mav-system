@@ -1,5 +1,8 @@
+import threading
+
+from tarsmav.mavlink.interfaces import ISenderMonitor
 from tarsmav.mavlink.mavlink_config import mavutil
-from tarsmav.mavlink.sender_monitor import SenderMonitor
+from tarsmav.mavlink._sender_monitor import SenderMonitor
 from tarsmav.mavlink.sender_policy import MessagePriority
 from tarsmav.mavlink.sender_policy import SenderPolicy
 
@@ -13,44 +16,46 @@ class MavLinkSender:
             max_messages_per_sec=self._policy.max_messages_per_sec,
             max_bytes_per_sec=self._policy.max_bytes_per_sec,
         )
+        self._lock = threading.Lock()
 
         print("[mavlink][MavLinkSender][__init__] Initialized")
 
     @property
-    def monitor(self) -> SenderMonitor:
+    def monitor(self) -> ISenderMonitor:
         return self._monitor
 
     def send(self, message) -> bool:
-        message_type = message.get_type()
-        priority = self._policy.get_priority(message_type)
+        with self._lock:
+            message_type = message.get_type()
+            priority = self._policy.get_priority(message_type)
 
-        data = message.pack(self._mav)
-        size_bytes = len(data)
+            data = message.pack(self._mav)
+            size_bytes = len(data)
 
-        if self._should_drop(priority=priority, size_bytes=size_bytes):
-            self._monitor.register_drop(message_type)
+            if self._should_drop(priority=priority, size_bytes=size_bytes):
+                self._monitor.register_drop(message_type)
 
-            print(
-                f"[mavlink][MavLinkSender][send][warning] "
-                f"Dropped message type={message_type} "
-                f"priority={priority.name} size={size_bytes}"
-            )
-            return False
+                print(
+                    f"[mavlink][MavLinkSender][send][warning] "
+                    f"Dropped message type={message_type} "
+                    f"priority={priority.name} size={size_bytes}"
+                )
+                return False
 
-        self._writer(data)
-        self._monitor.register_sent(size_bytes)
+            self._writer(data)
+            self._monitor.register_sent(size_bytes)
 
-        if self._monitor.should_warn_high_load():
-            print(
-                f"[mavlink][MavLinkSender][send][warning] "
-                f"High load detected: "
-                f"avg_load_pct={self._monitor.get_avg_load_pct():.1f}, "
-                f"high_load_time_pct={self._monitor.get_high_load_time_pct():.1f}, "
-                f"sent_bytes_per_sec={self._monitor.get_sent_bytes_per_sec():.1f}, "
-                f"sent_messages_per_sec={self._monitor.get_sent_messages_per_sec():.1f}"
-            )
+            if self._monitor.should_warn_high_load():
+                print(
+                    f"[mavlink][MavLinkSender][send][warning] "
+                    f"High load detected: "
+                    f"avg_load_pct={self._monitor.get_avg_load_pct():.1f}, "
+                    f"high_load_time_pct={self._monitor.get_high_load_time_pct():.1f}, "
+                    f"sent_bytes_per_sec={self._monitor.get_sent_bytes_per_sec():.1f}, "
+                    f"sent_messages_per_sec={self._monitor.get_sent_messages_per_sec():.1f}"
+                )
 
-        return True
+            return True
 
     def _should_drop(self, priority: MessagePriority, size_bytes: int) -> bool:
         if priority == MessagePriority.CRITICAL:

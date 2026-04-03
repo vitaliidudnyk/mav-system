@@ -51,3 +51,7 @@ class TarsMavCore:
 
     def start(self) -> None:
         self._reader.start()
+
+    def stop(self) -> None:
+        self._reader.stop()
+        self._sender.close()

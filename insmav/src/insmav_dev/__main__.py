@@ -7,16 +7,16 @@ from insmav_dev.transport.udp_reader import UdpReader
 from insmav_dev.transport.udp_writer import UdpWriter
 
 
-def main() -> None:
+def main():
     host = "127.0.0.1"
 
     reader = UdpReader(host=host, port=14550)
     writer = UdpWriter(target_host=host, target_port=14551)
 
-    core = InsMavCore(reader=reader, writer=writer)
+    core = InsMavCore(reader, writer)
     dash_app = DashApp(core)
 
-    core_thread = threading.Thread(target=core.start, daemon=True)
+    core_thread = threading.Thread(target=core.start)
     dash_thread = threading.Thread(target=dash_app.run, daemon=True)
 
     core_thread.start()
@@ -27,10 +27,17 @@ def main() -> None:
 
     try:
         while True:
-            time.sleep(1.0)
+            time.sleep(1)
+
     except KeyboardInterrupt:
         print("[main] Stopping...")
-        reader.stop()
+
+        core.stop()
+
+        core_thread.join()
+
+
+        print("[main] Stopped cleanly")
 
 
 if __name__ == "__main__":

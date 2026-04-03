@@ -70,6 +70,10 @@ class InsMavCore:
     def start(self) -> None:
         self._reader.start()
 
+    def stop(self) -> None:
+        self._reader.stop()
+        self._writer.close()
+
     def request_all_params(self) -> None:
         self.param_requester.request_all()
 
