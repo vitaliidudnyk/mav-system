@@ -37,12 +37,12 @@ class DatasetHandler(BaseHandler):
 
         dataset = dataset_class.from_array(list(message.data))
 
-        print(
-            f"[Dataset][parsed] "
-            f"dataset_type={dataset_type.value} "
-            f"array_id={message.array_id} "
-            f"dataset={dataset}"
-        )
+        # print(
+        #     f"[Dataset][parsed] "
+        #     f"dataset_type={dataset_type.value} "
+        #     f"array_id={message.array_id} "
+        #     f"dataset={dataset}"
+        # )
 
         self._state.add_dataset(dataset_type.value, dataset)
 

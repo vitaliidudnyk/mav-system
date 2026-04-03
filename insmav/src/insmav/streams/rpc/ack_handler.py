@@ -1,4 +1,4 @@
-from insmav.inspector_state import InspectorState
+from insmav.domain.inspector_state import InspectorState
 from insmav.streams.shared.base_handler import BaseHandler
 from insmav.streams.rpc.pending_commands import PendingCommands
 

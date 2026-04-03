@@ -18,14 +18,14 @@ class UdpReader:
 
     def start(self) -> None:
         self._sock.bind((self._host, self._port))
-        print(f"[udp][UdpReader][start] Listening on {self._host}:{self._port}")
+        # print(f"[udp][UdpReader][start] Listening on {self._host}:{self._port}")
 
         self._is_running = True
 
         while self._is_running:
             try:
                 data, addr = self._sock.recvfrom(4096)
-                print(f"[udp][UdpReader][start] Received {len(data)} bytes from {addr}")
+                # print(f"[udp][UdpReader][start] Received {len(data)} bytes from {addr}")
 
                 if self._on_data is not None:
                     self._on_data(data)

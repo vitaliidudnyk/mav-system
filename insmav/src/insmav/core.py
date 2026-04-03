@@ -1,4 +1,4 @@
-from insmav.inspector_state import InspectorState
+from insmav.domain.inspector_state import InspectorState
 from insmav.mavlink.mavlink_receiver import MavlinkReceiver
 from insmav.mavlink.mavlink_sender import MavlinkSender
 

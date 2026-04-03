@@ -1,3 +1,4 @@
+from insmav.streams.params.param_name import normalize_param_name
 from insmav.streams.shared.base_handler import BaseHandler
 
 
@@ -73,9 +74,4 @@ class ParamHandler(BaseHandler):
 
     @staticmethod
     def _extract_param_name(message) -> str:
-        raw_name = message.param_id
-
-        if isinstance(raw_name, bytes):
-            return raw_name.decode("utf-8", errors="ignore").rstrip("\x00")
-
-        return str(raw_name).rstrip("\x00")
+        return normalize_param_name(message.param_id)

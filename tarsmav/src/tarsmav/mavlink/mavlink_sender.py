@@ -32,6 +32,12 @@ class MavLinkSender:
             data = message.pack(self._mav)
             size_bytes = len(data)
 
+            print(
+                f"[mavlink][MavLinkSender][send] "
+                f"start sending type={message_type} "
+                f"priority={priority.name} size={size_bytes}"
+            )
+
             if self._should_drop(priority=priority, size_bytes=size_bytes):
                 self._monitor.register_drop(message_type)
 

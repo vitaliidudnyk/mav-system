@@ -13,5 +13,5 @@ class TelemetryHandler(BaseHandler):
         )
 
     def handle(self, message) -> None:
-        print(f"[Telemetry] {message}")
+        # print(f"[Telemetry] {message}")
         self._state.add_telemetry(message)

@@ -1,4 +1,5 @@
 from tarsmav.mavlink.mavlink_config import mavutil
+from tarsmav.streams.params.param_name import normalize_param_name
 
 
 class ParamHandler:
@@ -93,8 +94,10 @@ class ParamHandler:
         param_count: int,
         param_index: int,
     ) -> None:
+        normalized_name = normalize_param_name(name)
+
         message = mavutil.mavlink.MAVLink_param_value_message(
-            param_id=name.encode("utf-8"),
+            param_id=normalized_name.encode("utf-8"),
             param_value=value,
             param_type=param_type,
             param_count=param_count,
@@ -103,15 +106,10 @@ class ParamHandler:
 
         print(
             f"[params][ParamHandler][_send_param_value] "
-            f"{name}={value} index={param_index}/{param_count}"
+            f"{normalized_name}={value} index={param_index}/{param_count}"
         )
         self._mavlink_transmitter.send(message)
 
     @staticmethod
     def _extract_param_name(message) -> str:
-        raw_name = message.param_id
-
-        if isinstance(raw_name, bytes):
-            return raw_name.decode("utf-8", errors="ignore").rstrip("\x00")
-
-        return str(raw_name).rstrip("\x00")
+        return normalize_param_name(message.param_id)

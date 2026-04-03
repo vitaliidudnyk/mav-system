@@ -32,10 +32,10 @@ class UdpReader:
             try:
                 data, addr = self._socket.recvfrom(self._buffer_size)
 
-                print(
-                    f"[udp][UdpReader][start] "
-                    f"Received {len(data)} bytes from {addr}"
-                )
+                # print(
+                #     f"[udp][UdpReader][start] "
+                #     f"Received {len(data)} bytes from {addr}"
+                # )
 
                 self._on_data(data)
 

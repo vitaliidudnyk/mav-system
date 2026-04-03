@@ -11,13 +11,15 @@ def build_layout():
     return html.Div(
         [
             html.H1("Inspector Dashboard"),
-
             dcc.Interval(
                 id="refresh-interval",
                 interval=1000,
                 n_intervals=0,
             ),
-
+            dcc.Store(
+                id="params-draft-store",
+                data={},
+            ),
             dcc.Tabs(
                 id="main-tabs",
                 value="telemetry",

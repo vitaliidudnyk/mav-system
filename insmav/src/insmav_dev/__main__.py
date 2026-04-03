@@ -22,7 +22,7 @@ def main():
     core_thread.start()
     dash_thread.start()
 
-    time.sleep(0.5)
+    time.sleep(2)
     core.request_all_params()
 
     try:

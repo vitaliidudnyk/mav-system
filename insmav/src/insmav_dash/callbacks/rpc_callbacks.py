@@ -86,8 +86,18 @@ def register_rpc_callbacks(app, state, core) -> None:
         Input("refresh-interval", "n_intervals"),
     )
     def update_rpc_tables(_n_intervals):
-        rpc_history = state.get_rpc_history()
-        rpc_ack_history = state.get_rpc_ack_history()
+        rpc_history = state.try_read_rpc_history("rpc-table")
+        rpc_ack_history = state.try_read_rpc_ack_history("rpc-table")
+
+        if rpc_history is None and rpc_ack_history is None:
+            raise PreventUpdate
+
+        rpc_history = rpc_history if rpc_history is not None else state.read_rpc_history()
+        rpc_ack_history = (
+            rpc_ack_history
+            if rpc_ack_history is not None
+            else state.read_rpc_ack_history()
+        )
 
         history_rows = [
             {

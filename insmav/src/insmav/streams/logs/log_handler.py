@@ -36,9 +36,9 @@ class LogHandler(BaseHandler):
         except UnicodeDecodeError:
             text = bytes(buffer).decode("utf-8", errors="replace")
 
-        print(
-            f"[Log] id={log_id} ofs={offset} count={count} text='{text}'"
-        )
+        # print(
+        #     f"[Log] id={log_id} ofs={offset} count={count} text='{text}'"
+        # )
 
         if b"\n" not in chunk:
             return

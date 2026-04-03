@@ -1,3 +1,6 @@
+from insmav.streams.params.param_name import normalize_param_name
+
+
 class PendingParams:
     def __init__(self):
         self._request_all_pending = False
@@ -14,26 +17,32 @@ class PendingParams:
         return self._request_all_pending
 
     def add_read(self, name: str) -> None:
-        self._pending_reads.add(name)
+        normalized_name = normalize_param_name(name)
+        self._pending_reads.add(normalized_name)
 
     def confirm_read(self, name: str) -> bool:
-        if name not in self._pending_reads:
+        normalized_name = normalize_param_name(name)
+
+        if normalized_name not in self._pending_reads:
             return False
 
-        self._pending_reads.remove(name)
+        self._pending_reads.remove(normalized_name)
         return True
 
     def add_set(self, name: str, value: float) -> None:
-        self._pending_sets[name] = value
+        normalized_name = normalize_param_name(name)
+        self._pending_sets[normalized_name] = value
 
     def confirm_set(self, name: str, value: float) -> bool:
-        if name not in self._pending_sets:
+        normalized_name = normalize_param_name(name)
+
+        if normalized_name not in self._pending_sets:
             return False
 
-        expected_value = self._pending_sets[name]
+        expected_value = self._pending_sets[normalized_name]
 
         if expected_value != value:
             return False
 
-        del self._pending_sets[name]
+        del self._pending_sets[normalized_name]
         return True
